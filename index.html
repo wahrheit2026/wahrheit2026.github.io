@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KLAUS // OBDACHLOSER HACKER BERLIN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --matrix-green: #00ff41;
+            --dark-green: #003b00;
+            --amber: #ffb000;
+            --crt-bg: #0a0a0a;
+            --terminal-bg: #111;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--crt-bg);
+            color: var(--matrix-green);
+            font-family: 'Share Tech Mono', monospace;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* CRT Scanline Effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* Matrix Rain Canvas */
+        #matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: 2px solid var(--matrix-green);
+            margin-bottom: 30px;
+        }
+
+        .glitch {
+            font-size: 3.5rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            position: relative;
+            text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff,
+                         0.025em 0.04em 0 #fffc00;
+            animation: glitch 725ms infinite;
+        }
+
+        @keyframes glitch {
+            0% { text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff; }
+            15% { text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff; }
+            16% { text-shadow: -0.05em -0.025em 0 #00fffc, 0.025em 0.035em 0 #fc00ff; }
+            49% { text-shadow: -0.05em -0.025em 0 #00fffc, 0.025em 0.035em 0 #fc00ff; }
+            50% { text-shadow: 0.05em 0.035em 0 #00fffc, 0.03em 0 0 #fc00ff; }
+            99% { text-shadow: 0.05em 0.035em 0 #00fffc, 0.03em 0 0 #fc00ff; }
+            100% { text-shadow: -0.05em 0 0 #00fffc, -0.025em -0.04em 0 #fc00ff; }
+        }
+
+        .subtitle {
+            color: var(--amber);
+            font-size: 1.2rem;
+            margin-top: 10px;
+            opacity: 0.8;
+        }
+
+        .blink {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        /* Terminal Windows */
+        .terminal {
+            background: var(--terminal-bg);
+            border: 1px solid var(--matrix-green);
+            border-radius: 8px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+        }
+
+        .terminal-header {
+            background: linear-gradient(90deg, var(--dark-green), #1a1a1a);
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--matrix-green);
+        }
+
+        .terminal-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .btn-close { background: #ff5f56; }
+        .btn-min { background: #ffbd2e; }
+        .btn-max { background: #27c93f; }
+
+        .terminal-title {
+            margin-left: 10px;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .terminal-body {
+            padding: 20px;
+            font-family: 'VT323', monospace;
+            font-size: 1.3rem;
+            line-height: 1.6;
+        }
+
+        .prompt {
+            color: var(--matrix-green);
+        }
+
+        .command {
+            color: #fff;
+        }
+
+        .output {
+            color: #aaa;
+            margin: 5px 0 15px 20px;
+        }
+
+        .highlight {
+            color: var(--amber);
+        }
+
+        .error {
+            color: #ff4444;
+        }
+
+        /* Photo Gallery */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .photo-card {
+            background: var(--terminal-bg);
+            border: 1px solid var(--matrix-green);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .photo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 65, 0.3);
+        }
+
+        .photo-card img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            filter: sepia(50%) hue-rotate(80deg) contrast(1.1);
+            transition: filter 0.3s;
+        }
+
+        .photo-card:hover img {
+            filter: sepia(0%) hue-rotate(0deg);
+        }
+
+        .photo-caption {
+            padding: 15px;
+            text-align: center;
+            color: var(--amber);
+            font-size: 0.9rem;
+        }
+
+        /* Hacker Tools */
+        .tool-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .tool-box {
+            background: var(--terminal-bg);
+            border: 1px solid var(--matrix-green);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .tool-title {
+            color: var(--amber);
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+
+        input, button, textarea {
+            background: #1a1a1a;
+            border: 1px solid var(--matrix-green);
+            color: var(--matrix-green);
+            padding: 10px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1rem;
+            border-radius: 4px;
+            width: 100%;
+            margin: 5px 0;
+        }
+
+        button {
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background: var(--matrix-green);
+            color: #000;
+            box-shadow: 0 0 15px var(--matrix-green);
+        }
+
+        .result-box {
+            background: #0a0a0a;
+            border: 1px solid #333;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 4px;
+            font-family: 'VT323', monospace;
+            font-size: 1.2rem;
+            min-height: 50px;
+            word-break: break-all;
+        }
+
+        /* Unicode Table */
+        .unicode-demo {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .unicode-char {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .unicode-char:hover {
+            border-color: var(--matrix-green);
+            background: var(--dark-green);
+        }
+
+        .char-visual {
+            font-size: 1.5rem;
+            display: block;
+        }
+
+        .char-code {
+            font-size: 0.7rem;
+            color: #666;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin: 15px 0;
+        }
+
+        .progress-bar {
+            background: #1a1a1a;
+            border: 1px solid var(--matrix-green);
+            height: 25px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--matrix-green), var(--amber));
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: #000;
+        }
+
+        /* Typing Effect */
+        .typewriter {
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 2px solid var(--matrix-green);
+            animation: typing 3s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--matrix-green) }
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px;
+            border-top: 1px solid #333;
+            margin-top: 40px;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .footer span {
+            color: var(--matrix-green);
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .glitch { font-size: 2rem; }
+            .unicode-demo { grid-template-columns: repeat(2, 1fr); }
+            .tool-section { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix-canvas"></canvas>
+    
+    <div class="container">
+        <header class="header">
+            <h1 class="glitch">KLAUS_OBH_23Y_CCC</h1>
+            <p class="subtitle">Obdachloser Hacker aus Berlin // CCC-Schuldner seit 23 Jahren<span class="blink">_</span></p>
+        </header>
+
+        <!-- About Terminal -->
+        <div class="terminal">
+            <div class="terminal-header">
+                <span class="terminal-btn btn-close"></span>
+                <span class="terminal-btn btn-min"></span>
+                <span class="terminal-btn btn-max"></span>
+                <span class="terminal-title">klaus@public-wifi:~/.obdachlos</span>
+            </div>
+            <div class="terminal-body">
+                <div><span class="prompt">klaus@straße$</span> <span class="command">whoami</span></div>
+                <div class="output">
+                    <span class="highlight">Klaus Müller</span> - Ex-Millionär, aktuell obdachlos<br>
+                    Mitglied: Chaos Computer Club (suspended)<br>
+                    Status: <span class="error">23 Jahre Beiträge nicht bezahlt</span><br>
+                    Vermögen: <span class="error">Eingeklagt vom CCC e.V.</span><br>
+                    Aktueller Standort: Öffentliches WLAN bei McDonald's Alexanderplatz
+                </div>
+                
+                <div><span class="prompt">klaus@straße$</span> <span class="command">cat lebenslauf.txt</span></div>
+                <div class="output">
+                    > War mal reich... sehr reich.<br>
+                    > Habe den CCC seit 2001 nicht mehr bezahlt.<br>
+                    > Die haben ALLES eingeklagt. ALLES.<br>
+                    > Aber ich hack weiter! Dank McDonald's-WLAN!<br>
+                    > Meine Spezialitäten: Unicode, Normalization, RSA (ich kenne d!)
+                </div>
+                
+                <div><span class="prompt">klaus@straße$</span> <span class="command">ping ccc.de</span></div>
+                <div class="output">
+                    PING ccc.de (195.54.164.68): 56 data bytes<br>
+                    64 bytes from 195.54.164.68: icmp_seq=0 ttl=56 time=<span class="error">DENIED - BEITRAGSSCHULDEN</span><br>
+                    --- ccc.de ping statistics ---<br>
+                    1 packets transmitted, 0 received, <span class="highlight">100% SCHULDEN</span>, time 23 Jahre
+                </div>
+                
+                <div><span class="prompt">klaus@straße$</span> <span class="command">sudo rm -rf /schulden</span><div class="blink">_</div></div>
+            </div>
+        </div>
+
+        <!-- Photos -->
+        <div class="terminal">
+            <div class="terminal-header">
+                <span class="terminal-btn btn-close"></span>
+                <span class="terminal-btn btn-min"></span>
+                <span class="terminal-btn btn-max"></span>
+                <span class="terminal-title">klaus@straße:~/foto</span>
+            </div>
+            <div class="terminal-body">
+                <div><span class="prompt">klaus@straße$</span> <span class="command">ls -la foto/</span></div>
+                <div class="output">-rw-r--r-- 1 klaus klaus 1.2M Jan 15 2024 Klaus1.png<br>-rw-r--r-- 1 klaus klaus 980K Jan 15 2024 Klaus2.png</div>
+                
+                <div class="photo-grid">
+                    <div class="photo-card">
+                        <img src="foto/Klaus1.png" alt="Klaus bei der Arbeit">
+                        <div class="photo-caption">Klaus bei der Arbeit // McDonald's WiFi</div>
+                    </div>
+                    <div class="photo-card">
+                        <img src="foto/Klaus2.png" alt="Klaus denkt nach">
+                        <div class="photo-caption">Klaus denkt über d nach // RSA-Hacking</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hacker Tools -->
+        <div class="tool-section">
+            <!-- Unicode Tool -->
+            <div class="tool-box">
+                <div class="tool-title">[1] UNICODE NORMALIZATION EXPLOITATION</div>
+                <p style="font-size:0.9rem; color:#888; margin-bottom:10px;">Klaus' Spezialität: Unsichtbare Zeichen und Homoglyphen</p>
+                
+                <input type="text" id="unicode-input" placeholder="Text eingeben..." value="admin">
+                <button onclick="normalizeText()">NORMALISIEREN & EXPLOITEN</button>
+                
+                <div class="result-box" id="unicode-result">
+                    Warte auf Input...
+                </div>
+                
+                <div style="margin-top:15px; font-size:0.85rem; color:#666;">
+                    Klaus' Unicode-Waffen:
+                </div>
+                <div class="unicode-demo">
+                    <div class="unicode-char" onclick="addUnicode('\u0300')">
+                        <span class="char-visual">◌̀</span>
+                        <span class="char-code">U+0300</span>
+                    </div>
+                    <div class="unicode-char" onclick="addUnicode('\u0301')">
+                        <span class="char-visual">◌́</span>
+                        <span class="char-code">U+0301</span>
+                    </div>
+                    <div class="unicode-char" onclick="addUnicode('\u200E')">
+                        <span class="char-visual">LRM</span>
+                        <span class="char-code">U+200E</span>
+                    </div>
+                    <div class="unicode-char" onclick="addUnicode('\u200F')">
+                        <span class="char-visual">RLM</span>
+                        <span class="char-code">U+200F</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RSA Tool -->
+            <div class="tool-box">
+                <div class="tool-title">[2] RSA-HACKING (Ich kenne d!)</div>
+                <p style="font-size:0.9rem; color:#888; margin-bottom:10px;">Klaus weiß: Wenn d zu klein ist, ist RSA gebrochen!</p>
+                
+                <input type="number" id="rsa-n" placeholder="n (Modulus)" value="3233">
+                <input type="number" id="rsa-e" placeholder="e (Public Exponent)" value="17">
+                <input type="number" id="rsa-d" placeholder="d (Private Key - wenn bekannt)" value="2753">
+                <button onclick="hackRSA()">RSA KNOCKEN</button>
+                
+                <div class="progress-container" id="rsa-progress" style="display:none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill">0%</div>
+                    </div>
+                </div>
+                
+                <div class="result-box" id="rsa-result">
+                    Klaus wartet auf RSA-Parameter...
+                </div>
+            </div>
+
+            <!-- WiFi Finder -->
+            <div class="tool-box">
+                <div class="tool-title">[3] ÖFFENTLICHES WLAN SCANNER</div>
+                <p style="font-size:0.9rem; color:#888; margin-bottom:10px;">Klaus' Überlebensstrategie in Berlin</p>
+                
+                <button onclick="scanWiFi()">SCANNE WLANs</button>
+                
+                <div class="result-box" id="wifi-result" style="min-height:200px;">
+                    [+] System bereit...<br>
+                    [+] wlan0 im Monitor Mode<br>
+                    [+] Warte auf Scan-Befehl...
+                </div>
+            </div>
+
+            <!-- CCC Schuldenrechner -->
+            <div class="tool-box">
+                <div class="tool-title">[4] CCC-SCHULDENRECHNER</div>
+                <p style="font-size:0.9rem; color:#888; margin-bottom:10px;">Berechne Klaus' finanzielles Verderben</p>
+                
+                <div style="margin:10px 0;">
+                    <label>Jahre nicht bezahlt:</label>
+                    <input type="number" id="years-debt" value="23" min="1" max="50">
+                </div>
+                <div style="margin:10px 0;">
+                    <label>Beitrag/Jahr (€):</label>
+                    <input type="number" id="yearly-fee" value="60" min="1">
+                </div>
+                <div style="margin:10px 0;">
+                    <label>Zinsen (%):</label>
+                    <input type="number" id="interest-rate" value="5" min="0">
+                </div>
+                <button onclick="calculateDebt()">SCHULDEN BERECHNEN</button>
+                
+                <div class="result-box" id="debt-result">
+                    Klaus' Lebenstragödie in Zahlen...
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Gebaut mit <span>💚</span> (und öffentlichem WLAN) von Klaus</p>
+            <p style="margin-top:10px; font-size:0.8rem;">Chaos Computer Club hat diese Seite noch nicht eingeklagt.</p>
+            <p style="margin-top:5px; color:#333;">|| <span class="blink">_</span> ||</p>
+        </div>
+    </div>
+
+    <script>
+        // Matrix Rain Effect
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*(){}[]<>/~`|\\-_=+カクシュリコウシンワハクデシテアスラヲリソマレム';
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = [];
+        
+        for (let i = 0; i < columns; i++) {
+            drops[i] = 1;
+        }
+        
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#00ff41';
+            ctx.font = fontSize + 'px monospace';
+            
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        
+        setInterval(drawMatrix, 35);
+        
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Unicode Normalization
+        function normalizeText() {
+            const input = document.getElementById('unicode-input').value;
+            const result = document.getElementById('unicode-result');
+            
+            const nfc = input.normalize('NFC');
+            const nfd = input.normalize('NFD');
+            const nfkc = input.normalize('NFKC');
+            const nfkd = input.normalize('NFKD');
+            
+            result.innerHTML = `
+                <span class="highlight">Original:</span> "${input}" (${input.length} chars)<br>
+                <span class="highlight">NFC:</span> "${nfc}" (${nfc.length} chars)<br>
+                <span class="highlight">NFD:</span> "${nfd}" (${nfd.length} chars)<br>
+                <span class="highlight">NFKC:</span> "${nfkc}" (${nfkc.length} chars)<br>
+                <span class="highlight">NFKD:</span> "${nfkd}" (${nfkd.length} chars)<br><br>
+                <span style="color:#ff4444;">⚠ Klaus-Exploit: NFD length ${nfd.length} vs NFC length ${nfc.length}</span>
+            `;
+        }
+
+        function addUnicode(char) {
+            const input = document.getElementById('unicode-input');
+            input.value += char;
+            normalizeText();
+        }
+
+        // RSA Hacking
+        function hackRSA() {
+            const n = parseInt(document.getElementById('rsa-n').value);
+            const e = parseInt(document.getElementById('rsa-e').value);
+            const d = parseInt(document.getElementById('rsa-d').value);
+            const result = document.getElementById('rsa-result');
+            const progress = document.getElementById('rsa-progress');
+            const fill = document.getElementById('progress-fill');
+            
+            progress.style.display = 'block';
+            
+            let percent = 0;
+            const interval = setInterval(() => {
+                percent += 5;
+                fill.style.width = percent + '%';
+                fill.textContent = percent + '%';
+                
+                if (percent >= 100) {
+                    clearInterval(interval);
+                    
+                    // Klaus' "Hack": Wenn wir d kennen, haben wir den private key!
+                    const p = 61; // Für n=3233, p=61, q=53
+                    const q = 53;
+                    const phi = (p-1) * (q-1);
+                    
+                    result.innerHTML = `
+                        <span class="highlight">[+] RSA geknackt!</span><br><br>
+                        n = ${n}<br>
+                        e = ${e}<br>
+                        d = ${d} <span style="color:#ff4444;">(Klaus kennt d!)</span><br><br>
+                        Private Key: (${d}, ${n})<br>
+                        Phi(n) = ${phi}<br>
+                        p = ${p}, q = ${q}<br><br>
+                        <span style="color:#ffb000;">Klaus sagt: "Ich habe d gekannt seit 2001!"</span>
+                    `;
+                }
+            }, 50);
+        }
+
+        // WiFi Scanner
+        function scanWiFi() {
+            const result = document.getElementById('wifi-result');
+            const networks = [
+                { name: 'McDonald´s Free WiFi', signal: 95, secured: false },
+                { name: 'Starbucks Guest', signal: 82, secured: false },
+                { name: 'Kaufland_Kunden_WLAN', signal: 78, secured: false },
+                { name: 'Vodafone-XX23', signal: 45, secured: true },
+                { name: 'Telekom_FON', signal: 67, secured: false },
+                { name: 'CCC_Berlin_Office (GESICHERT)', signal: 12, secured: true, dangerous: true },
+                { name: 'Klaus_Hotspot (honeypot)', signal: 100, secured: false, mine: true }
+            ];
+            
+            result.innerHTML = '[+] Scanning...<br>';
+            
+            let i = 0;
+            const interval = setInterval(() => {
+                if (i >= networks.length) {
+                    clearInterval(interval);
+                    result.innerHTML += '<br><span style="color:#00ff41;">[+] Scan complete. 7 networks found.</span><br>';
+                    result.innerHTML += '<span style="color:#ffb000;">[+] Klaus empfiehlt: McDonald´s hat den besten Ping!</span>';
+                    return;
+                }
+                
+                const net = networks[i];
+                let color = net.secured ? '#ff4444' : '#00ff41';
+                let symbol = net.secured ? '🔒' : '🔓';
+                let extra = '';
+                
+                if (net.dangerous) {
+                    color = '#ff0000';
+                    extra = ' <span style="color:#ff0000;">[NICHT VERBINDEN - CCC KÖNNTE MICH SEHEN!]</span>';
+                }
+                if (net.mine) {
+                    color = '#ffb000';
+                    symbol = '🎯';
+                    extra = ' <span style="color:#ffb000;">[MEIN HONEYPOT - FÜR SCHULDENEINTREIBER]</span>';
+                }
+                
+                result.innerHTML += `<span style="color:${color};">${symbol} ${net.name} (${net.signal}%)${extra}</span><br>`;
+                i++;
+            }, 300);
+        }
+
+        // CCC Debt Calculator
+        function calculateDebt() {
+            const years = parseInt(document.getElementById('years-debt').value);
+            const fee = parseInt(document.getElementById('yearly-fee').value);
+            const interest = parseInt(document.getElementById('interest-rate').value);
+            const result = document.getElementById('debt-result');
+            
+            let totalDebt = 0;
+            let calculation = '<span class="highlight">Klaus\' finanzielles Desaster:</span><br><br>';
+            
+            for (let year = 1; year <= years; year++) {
+                const yearDebt = fee * Math.pow(1 + interest/100, year);
+                totalDebt += yearDebt;
+                calculation += `Jahr ${year}: ${yearDebt.toFixed(2)} €<br>`;
+            }
+            
+            calculation += `<br><span style="color:#ff4444; font-size:1.3rem;">`;
+            calculation += `GESAMTSCHULD: ${totalDebt.toFixed(2)} €<br>`;
+            calculation += `Hinzu: Anwaltskosten, Zinsen auf Zinsen, Würde`;
+            calculation += `</span><br><br>`;
+            calculation += `<span style="color:#ffb000;">Klaus\' Fazit: "Hätte ich mal bezahlt..."</span>`;
+            
+            result.innerHTML = calculation;
+        }
+
+        // Terminal typing effect on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.querySelector('.typewriter')?.classList.add('typing');
+            }, 500);
+        });
+    </script>
+</body>
+</html>
