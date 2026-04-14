@@ -359,6 +359,81 @@
             color: var(--matrix-green);
         }
 
+        /* Posthörnchen / Chaosknoten Animation */
+        .posthoernchen {
+            width: 80px;
+            height: 80px;
+            margin: 20px auto;
+            position: relative;
+            animation: rotate 4s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .horn-svg {
+            fill: none;
+            stroke: var(--matrix-green);
+            stroke-width: 2;
+            filter: drop-shadow(0 0 10px var(--matrix-green));
+        }
+
+        /* Hacker Links Section */
+        .hacker-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .hacker-card {
+            background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: var(--matrix-green);
+        }
+
+        .hacker-card:hover {
+            border-color: var(--matrix-green);
+            transform: translateX(5px);
+            box-shadow: -5px 0 15px rgba(0, 255, 65, 0.3);
+        }
+
+        .hacker-name {
+            color: var(--amber);
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .hacker-handle {
+            color: #666;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+
+        .hacker-achievement {
+            color: #888;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .legend-badge {
+            display: inline-block;
+            background: var(--matrix-green);
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
         /* Mobile */
         @media (max-width: 768px) {
             .glitch { font-size: 2rem; }
@@ -533,6 +608,125 @@
                 
                 <div class="result-box" id="debt-result">
                     Klaus' Lebenstragödie in Zahlen...
+                </div>
+            </div>
+        </div>
+
+        <!-- Posthörnchen & Deutsche Hacker Legenden -->
+        <div class="terminal">
+            <div class="terminal-header">
+                <span class="terminal-btn btn-close"></span>
+                <span class="terminal-btn btn-min"></span>
+                <span class="terminal-btn btn-max"></span>
+                <span class="terminal-title">klaus@straße:~/respekt</span>
+            </div>
+            <div class="terminal-body">
+                <div><span class="prompt">klaus@straße$</span> <span class="command">echo "Das Posthörnchen ruft..."</span></div>
+                
+                <!-- Posthörnchen SVG -->
+                <div class="posthoernchen">
+                    <svg viewBox="0 0 100 100" class="horn-svg">
+                        <!-- Post horn shape -->
+                        <ellipse cx="50" cy="50" rx="35" ry="20" transform="rotate(-30 50 50)"/>
+                        <ellipse cx="50" cy="50" rx="25" ry="14" transform="rotate(-30 50 50)"/>
+                        <!-- Bell/Horn end -->
+                        <path d="M 75 35 Q 85 25 90 40 Q 85 55 75 45" fill="none"/>
+                        <!-- Mouthpiece -->
+                        <line x1="25" y1="65" x2="15" y2="75" stroke-width="3"/>
+                        <!-- Decorative lines -->
+                        <path d="M 35 45 Q 50 40 65 45" fill="none" stroke-dasharray="3,3"/>
+                        <path d="M 35 55 Q 50 60 65 55" fill="none" stroke-dasharray="3,3"/>
+                    </svg>
+                </div>
+                
+                <div class="output" style="text-align:center; font-style:italic;">
+                    "Wer hat uns verraten? Die Post ist mit dabei!"<br>
+                    <span style="color:#666;">-- Altes CCC-Sprichwort</span>
+                </div>
+                
+                <div><span class="prompt">klaus@straße$</span> <span class="command">cat deutsche_hacker_legenden.txt</span></div>
+                <div class="output" style="margin-bottom:20px;">
+                    <span class="highlight">Deutsche Hacker, die was gerissen haben:</span><br>
+                    Klaus bewundert diese Legenden... (auch wenn sie beim CCC bezahlt haben)
+                </div>
+                
+                <div class="hacker-links">
+                    <a href="https://www.ccc.de" target="_blank" class="hacker-card">
+                        <div class="hacker-name">Chaos Computer Club <span class="legend-badge">GRANDE</span></div>
+                        <div class="hacker-handle">@ccc</div>
+                        <div class="hacker-achievement">Die Mutter aller Hacker-Vereine. Gegründet 1981. Klaus hat 23 Jahre nicht bezahlt.</div>
+                    </a>
+                    
+                    <a href="https://www.ercolani.org" target="_blank" class="hacker-card">
+                        <div class="hacker-name">Felix "FX" Lindner</div>
+                        <div class="hacker-handle">@felixlindner / FX</div>
+                        <div class="hacker-achievement">Recurity Labs, Phenoelit, iOS-Jailbreaks, Cisco IOS Exploits. Einer der ersten iPhone-Hacker.</div>
+                    </a>
+                    
+                    <a href="https://srlabs.de" target="_blank" class="hacker-card">
+                        <div class="hacker-name">Karsten Nohl</div>
+                        <div class="hacker-handle">@karstennoel</div>
+                        <div class="hacker-achievement">SR Labs, GSM/UMTS Hacking, SIM-Karten geknackt, BadUSB. Der Mann der Mobilfunknetze zerlegt.</div>
+                    </a>
+                    
+                    <a href="https://tldr.fail" target="_blank" class="hacker-card">
+                        <div class="hacker-name">Jann Horn</div>
+                        <div class="hacker-handle">@tehjh</div>
+                        <div class="hacker-achievement">Google Project Zero. Spectre/Meltdown, Linux Kernel Bugs, Chrome Sandbox Escapes. Pwn2Own Gewinner.</div>
+                    </a>
+                    
+                    <a href="https://trustfoundry.io" target="_blank" class="hacker-card">
+                        <div class="hacker-name">Thomas Roth</div>
+                        <div class="hacker-handle">@stacksmashing</div>
+                        <div class="hacker-achievement">TrustFoundry, Fault Injection, Chip-Reverse-Engineering, FPGA-Hacking. YouTube-Educator.</div>
+                    </a>
+                    
+                    <a href="https://fae.bo" target="_blank" class="hacker-card">
+                        <div class="hacker-name">Fabian Fäßler</div>
+                        <div class="hacker-handle">@faker_</div>
+                        <div class="hacker-achievement">RocketMQ RCEs, Java-Deserialization-Research, HackerOne-Top-Hacker aus Deutschland.</div>
+                    </a>
+                    
+                    <a href="https://blog.hboeck.de" target="_blank" class="hacker-card">
+                        <div class="hacker-name">Hanno Böck</div>
+                        <div class="hacker-handle">@hanno</div>
+                        <div class="hacker-achievement">Fuzzing-Projekte, SWEET32, DROWN, ROBOT. Der Mann der SSL/TLS zerbricht und dann repariert.</div>
+                    </a>
+                    
+                    <a href="https://www.youtube.com/c/StackSmashing" target="_blank" class="hacker-card">
+                        <div class="hacker-name">LiveOverflow</div>
+                        <div class="hacker-handle">@LiveOverflow</div>
+                        <div class="hacker-achievement">CTF-YouTuber, Binary Exploitation, Pwn-College. Millionen Views, billionen gelehrter Hacker.</div>
+                    </a>
+                    
+                    <a href="https://www.alles.de" target="_blank" class="hacker-card">
+                        <div class="hacker-name">Kim "Kaniini" Schmitz</div>
+                        <div class="hacker-handle">@KimDotcom</div>
+                        <div class="hacker-achievement">Megaupload, Internet-Mogul, früherer CCC-Mitglied. Von Hacker zu Millionär zu... kompliziert.</div>
+                    </a>
+                    
+                    <a href="https://www.snikt.net" target="_blank" class="hacker-card">
+                        <div class="hacker-name">Marc Ruef</div>
+                        <div class="hacker-handle">@marcruef</div>
+                        <div class="hacker-achievement">Snikt.net, Open Source Security Testing Tools, Vulnerability Research seit 2000+.</div>
+                    </a>
+                    
+                    <a href="https://insinuator.net" target="_blank" class="hacker-card">
+                        <div class="hacker-name">Insinuator Crew</div>
+                        <div class="hacker-handle">@insinuator</div>
+                        <div class="hacker-achievement">Penetration Testing Blog, Windows AD Hacking, German Hacker Collective seit Jahren aktiv.</div>
+                    </a>
+                    
+                    <a href="https://media.ccc.de" target="_blank" class="hacker-card">
+                        <div class="hacker-name">Chaos Communication Congress</div>
+                        <div class="hacker-handle">@c3</div>
+                        <div class="hacker-achievement">36C3, 37C3, 38C3... Die besten Talks Europas. Klaus schaut von draußen durchs Fenster zu.</div>
+                    </a>
+                </div>
+                
+                <div style="margin-top:20px; text-align:center; color:#555; font-size:0.85rem;">
+                    <span class="prompt">klaus@straße$</span> <span class="command">wget respect --from=these.legends</span>
+                    <div class="blink" style="display:inline;">_</div>
                 </div>
             </div>
         </div>
