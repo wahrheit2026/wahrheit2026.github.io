@@ -172,44 +172,55 @@
             color: #ff4444;
         }
 
-        /* Photo Gallery */
-        .photo-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin: 20px 0;
+        /* Photo Gallery - Full Size */
+        .photo-section {
+            margin: 40px 0;
         }
 
-        .photo-card {
+        .photo-card-full {
             background: var(--terminal-bg);
-            border: 1px solid var(--matrix-green);
+            border: 2px solid var(--matrix-green);
             border-radius: 8px;
             overflow: hidden;
             transition: transform 0.3s, box-shadow 0.3s;
+            margin: 30px 0;
+            box-shadow: 0 5px 20px rgba(0, 255, 65, 0.2);
         }
 
-        .photo-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 255, 65, 0.3);
+        .photo-card-full:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 40px rgba(0, 255, 65, 0.4);
         }
 
-        .photo-card img {
+        .photo-card-full img {
             width: 100%;
-            height: 300px;
-            object-fit: cover;
-            filter: sepia(50%) hue-rotate(80deg) contrast(1.1);
+            height: auto;
+            max-height: 600px;
+            object-fit: contain;
+            filter: sepia(30%) hue-rotate(80deg) contrast(1.1);
             transition: filter 0.3s;
+            display: block;
+            background: #0a0a0a;
         }
 
-        .photo-card:hover img {
+        .photo-card-full:hover img {
             filter: sepia(0%) hue-rotate(0deg);
         }
 
         .photo-caption {
-            padding: 15px;
+            padding: 20px;
             text-align: center;
             color: var(--amber);
-            font-size: 0.9rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-top: 1px solid var(--matrix-green);
+            background: linear-gradient(90deg, #0a0a0a, #1a1a1a, #0a0a0a);
+        }
+
+        .photo-meta {
+            color: #666;
+            font-size: 0.85rem;
+            margin-top: 5px;
         }
 
         /* Hacker Tools */
@@ -478,6 +489,23 @@
                     > Meine Spezialitäten: Unicode, Normalization, RSA (ich kenne d!)
                 </div>
                 
+                <div><span class="prompt">klaus@straße$</span> <span class="command">cat hobbies.txt</span></div>
+                <div class="output">
+                    > <span class="highlight">Aufm Bahnhofsklo abhängen</span> (Home Office, Baby!)<br>
+                    > <span class="highlight">Kiffen</span> (Qualitätsware vom Alexanderplatz)<br>
+                    > <span class="highlight">Saufen</span> (Desperados aus dem Späti)<br>
+                    > <span class="highlight">Hacken, Hacken, Hacken</span> (23/7, eine Stunde für Toilettenpausen)<br>
+                    > <span style="color:#666;">// Prioritäten sind wichtig, Alter!</span>
+                </div>
+                
+                <div><span class="prompt">klaus@straße$</span> <span class="command">ls -la ~/projekte/</span></div>
+                <div class="output">
+                    drwxr-xr-x 2 klaus klaus 4096 Jan 19 2026 .<br>
+                    drwxr-xr-x 15 klaus klaus 4096 Jan 15 2024 ..<br>
+                    -rw-r--r-- 1 klaus klaus 2.3M Jan 19 2026 <a href="nazi-codes.html" style="color:#ffb000; text-decoration:none;">nazi-codes.html</a> <span class="highlight">← NEU: Rechtsradikales Recherche Netzwerk</span><br>
+                    <span style="color:#666;">Wissenschaftliche Analyse versteckter Nazi-Codes in Lokalzeitungen</span>
+                </div>
+                
                 <div><span class="prompt">klaus@straße$</span> <span class="command">ping ccc.de</span></div>
                 <div class="output">
                     PING ccc.de (195.54.164.68): 56 data bytes<br>
@@ -490,26 +518,57 @@
             </div>
         </div>
 
-        <!-- Photos -->
-        <div class="terminal">
+        <!-- Photo 1 -->
+        <div class="terminal photo-section">
             <div class="terminal-header">
                 <span class="terminal-btn btn-close"></span>
                 <span class="terminal-btn btn-min"></span>
                 <span class="terminal-btn btn-max"></span>
-                <span class="terminal-title">klaus@straße:~/foto</span>
+                <span class="terminal-title">klaus@straße:~/foto/Klaus1.png</span>
             </div>
             <div class="terminal-body">
-                <div><span class="prompt">klaus@straße$</span> <span class="command">ls -la foto/</span></div>
-                <div class="output">-rw-r--r-- 1 klaus klaus 1.2M Jan 15 2024 Klaus1.png<br>-rw-r--r-- 1 klaus klaus 980K Jan 15 2024 Klaus2.png</div>
+                <div><span class="prompt">klaus@straße$</span> <span class="command">display foto/Klaus1.png --info</span></div>
+                <div class="output">
+                    File: Klaus1.png<br>
+                    Size: 1.2M<br>
+                    Dimensions: Full Resolution<br>
+                    Location: McDonald's Alexanderplatz<br>
+                    Status: Hacking in progress...
+                </div>
                 
-                <div class="photo-grid">
-                    <div class="photo-card">
-                        <img src="foto/Klaus1.png" alt="Klaus bei der Arbeit">
-                        <div class="photo-caption">Klaus bei der Arbeit // McDonald's WiFi</div>
+                <div class="photo-card-full">
+                    <img src="foto/Klaus1.png" alt="Klaus bei der Arbeit">
+                    <div class="photo-caption">
+                        Klaus bei der Arbeit // McDonald's WiFi
+                        <div class="photo-meta">Exfiltrating data via public hotspot | 23 Jahre CCC-Schulden</div>
                     </div>
-                    <div class="photo-card">
-                        <img src="foto/Klaus2.png" alt="Klaus denkt nach">
-                        <div class="photo-caption">Klaus denkt über d nach // RSA-Hacking</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Photo 2 -->
+        <div class="terminal photo-section">
+            <div class="terminal-header">
+                <span class="terminal-btn btn-close"></span>
+                <span class="terminal-btn btn-min"></span>
+                <span class="terminal-btn btn-max"></span>
+                <span class="terminal-title">klaus@straße:~/foto/Klaus2.png</span>
+            </div>
+            <div class="terminal-body">
+                <div><span class="prompt">klaus@straße$</span> <span class="command">display foto/Klaus2.png --info</span></div>
+                <div class="output">
+                    File: Klaus2.png<br>
+                    Size: 980K<br>
+                    Dimensions: Full Resolution<br>
+                    Mental State: Deep in thought<br>
+                    Focus: RSA parameter d
+                </div>
+                
+                <div class="photo-card-full">
+                    <img src="foto/Klaus2.png" alt="Klaus denkt nach">
+                    <div class="photo-caption">
+                        Klaus denkt über d nach // RSA-Hacking
+                        <div class="photo-meta">"Ich kenne d seit 2001!" | Calculating private keys mentally</div>
                     </div>
                 </div>
             </div>
@@ -788,6 +847,12 @@
                         <div class="hacker-name">CCC Event Organization Team <span class="legend-badge">37C3 38C3 39C3</span></div>
                         <div class="hacker-handle">@c3events</div>
                         <div class="hacker-achievement">Die Helden hinter den Kulissen. 37C3, 38C3, 39C3 organisiert. Klaus würde gerne helfen... aber Schulden.</div>
+                    </a>
+                    
+                    <a href="https://github.com/tramperllm" target="_blank" class="hacker-card">
+                        <div class="hacker-name">Rico Ecke <span class="legend-badge">OBH FRIEND</span></div>
+                        <div class="hacker-handle">@tramperllm / Hamburg</div>
+                        <div class="hacker-achievement">Klaus' BFF - Auch obdachloser Hacker aus Hamburg! Zusammen hacken sie auf öffentlichem WLAN. Brothers in homelessness.</div>
                     </a>
                 </div>
                 

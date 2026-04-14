@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RRN // NAZI-CODES IN LOKALZEITUNGEN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --matrix-green: #00ff41;
+            --dark-green: #003b00;
+            --amber: #ffb000;
+            --crt-bg: #0a0a0a;
+            --terminal-bg: #111;
+            --alert-red: #ff3333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--crt-bg);
+            color: var(--matrix-green);
+            font-family: 'Share Tech Mono', monospace;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        #matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: 2px solid var(--alert-red);
+            margin-bottom: 30px;
+        }
+
+        .glitch {
+            font-size: 3rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            position: relative;
+            text-shadow: 0.05em 0 0 #ff0000, -0.03em -0.04em 0 #ff4444,
+                         0.025em 0.04em 0 #ff8800;
+            animation: glitch 725ms infinite;
+            color: var(--alert-red);
+        }
+
+        @keyframes glitch {
+            0% { text-shadow: 0.05em 0 0 #ff0000, -0.03em -0.04em 0 #ff4444; }
+            15% { text-shadow: 0.05em 0 0 #ff0000, -0.03em -0.04em 0 #ff4444; }
+            16% { text-shadow: -0.05em -0.025em 0 #ff0000, 0.025em 0.035em 0 #ff4444; }
+            49% { text-shadow: -0.05em -0.025em 0 #ff0000, 0.025em 0.035em 0 #ff4444; }
+            50% { text-shadow: 0.05em 0.035em 0 #ff0000, 0.03em 0 0 #ff4444; }
+            99% { text-shadow: 0.05em 0.035em 0 #ff0000, 0.03em 0 0 #ff4444; }
+            100% { text-shadow: -0.05em 0 0 #ff0000, -0.025em -0.04em 0 #ff4444; }
+        }
+
+        .subtitle {
+            color: var(--amber);
+            font-size: 1.2rem;
+            margin-top: 10px;
+            opacity: 0.8;
+        }
+
+        .blink {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .terminal {
+            background: var(--terminal-bg);
+            border: 1px solid var(--alert-red);
+            border-radius: 8px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(255, 51, 51, 0.2);
+        }
+
+        .terminal-header {
+            background: linear-gradient(90deg, #330000, #1a1a1a);
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--alert-red);
+        }
+
+        .terminal-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .btn-close { background: #ff5f56; }
+        .btn-min { background: #ffbd2e; }
+        .btn-max { background: #27c93f; }
+
+        .terminal-title {
+            margin-left: 10px;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .terminal-body {
+            padding: 20px;
+            font-family: 'VT323', monospace;
+            font-size: 1.3rem;
+            line-height: 1.6;
+        }
+
+        .prompt {
+            color: var(--alert-red);
+        }
+
+        .command {
+            color: #fff;
+        }
+
+        .output {
+            color: #aaa;
+            margin: 5px 0 15px 20px;
+        }
+
+        .highlight {
+            color: var(--amber);
+        }
+
+        .error {
+            color: #ff4444;
+        }
+
+        .warning {
+            color: #ff8800;
+        }
+
+        .success {
+            color: #00ff41;
+        }
+
+        .code-block {
+            background: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'VT323', monospace;
+            font-size: 1.1rem;
+            overflow-x: auto;
+        }
+
+        .evidence-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .evidence-card {
+            background: var(--terminal-bg);
+            border: 1px solid var(--alert-red);
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .evidence-card:hover {
+            box-shadow: 0 5px 20px rgba(255, 51, 51, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .evidence-title {
+            color: var(--amber);
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 8px;
+        }
+
+        .code-list {
+            list-style: none;
+            margin: 10px 0;
+        }
+
+        .code-list li {
+            padding: 5px 0;
+            border-left: 3px solid var(--alert-red);
+            padding-left: 10px;
+            margin: 5px 0;
+        }
+
+        .code-list li::before {
+            content: "[+] ";
+            color: var(--alert-red);
+        }
+
+        .newspaper-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .newspaper-item {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .newspaper-item::before {
+            content: "📰 ";
+        }
+
+        .back-link {
+            display: inline-block;
+            background: var(--dark-green);
+            border: 1px solid var(--matrix-green);
+            color: var(--matrix-green);
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .back-link:hover {
+            background: var(--matrix-green);
+            color: #000;
+            box-shadow: 0 0 15px var(--matrix-green);
+        }
+
+        .disclaimer {
+            background: #1a0a0a;
+            border: 2px dashed var(--alert-red);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .disclaimer-text {
+            color: var(--alert-red);
+            font-size: 1.1rem;
+            font-style: italic;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px;
+            border-top: 1px solid #333;
+            margin-top: 40px;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .glitch { font-size: 1.8rem; }
+            .evidence-grid { grid-template-columns: 1fr; }
+            .newspaper-list { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix-canvas"></canvas>
+    
+    <div class="container">
+        <a href="index.html" class="back-link">← ZURÜCK ZU KLAUS</a>
+        
+        <header class="header">
+            <h1 class="glitch">RRN // RECHTSRADIKALES RECHERCHE NETZWERK</h1>
+            <p class="subtitle">Wissenschaftliche Analyse versteckter Nazi-Codes in Lokalzeitungen<span class="blink">_</span></p>
+        </header>
+
+        <!-- Projektbeschreibung -->
+        <div class="terminal">
+            <div class="terminal-header">
+                <span class="terminal-btn btn-close"></span>
+                <span class="terminal-btn btn-min"></span>
+                <span class="terminal-btn btn-max"></span>
+                <span class="terminal-title">rrn@klaus-laptop:~/untersuchung</span>
+            </div>
+            <div class="terminal-body">
+                <div><span class="prompt">rrn@straße$</span> <span class="command">cat projektbeschreibung.txt</span></div>
+                <div class="output">
+                    <span class="highlight">Rechtsradikales Recherche Netzwerk (RRN)</span><br><br>
+                    Dieses Repository dokumentiert umfassende wissenschaftliche Analysen zur Entdeckung versteckter rechtsextremer Codes in visuellen Medien. Wir untersuchen systematische subliminale Beeinflussungsstrategien durch das <span class="error">RedaktionsNetzwerk Deutschland (RND)</span>.<br><br>
+                    Untersuchungsdatum: <span class="warning">19. Januar 2026</span><br>
+                    Material: Lokale und regionale Zeitungen mit evidenzbasierten Hinweisen auf koordinierte subliminale Beeinflussung.
+                </div>
+                
+                <div><span class="prompt">rrn@straße$</span> <span class="command">grep -i "forschungsfokus" datenbank.json</span></div>
+                <div class="output">
+                    <span class="highlight">Forschungsfokus: Subliminale Beeinflussung durch Nazi-Codes & Medienkonzentration</span><br><br>
+                    - Szenecodierung: Erkennbarkeit für Initiierte im rechtsextremen Milieu<br>
+                    - Subliminale Beeinflussung: Unterschwellige Assoziationsbildung in der Allgemeinbevölkerung<br>
+                    - Normalisierung: Schrittweise Akzeptanzsteigerung extremistischer Symbolik<br>
+                    - Medienkonzentration: Kontrolle von <span class="error">über 150 Lokalzeitungen</span> durch das RND<br>
+                    - Nazi-artige Beeinflussung: Parallelen zu nationalsozialistischen Propagandamethoden
+                </div>
+            </div>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="disclaimer">
+            <p class="disclaimer-text">
+                ⚠ WICHTIGER HINWEIS: 99% der Menschheit ist dumm. Die meisten Leser dieses Dokuments sind mit 99,9% Wahrscheinlichkeit geistige Flachzangen. Wenn Sie dies nicht verstehen, beweisen Sie genau das. ⚠
+            </p>
+        </div>
+
+        <!-- Beweismaterialien -->
+        <div class="terminal">
+            <div class="terminal-header">
+                <span class="terminal-btn btn-close"></span>
+                <span class="terminal-btn btn-min"></span>
+                <span class="terminal-btn btn-max"></span>
+                <span class="terminal-title">rrn@straße:~/evidenz</span>
+            </div>
+            <div class="terminal-body">
+                <div><span class="prompt">rrn@straße$</span> <span class="command">ls -la beweismaterial/</span></div>
+                <div class="output">
+                    <span class="highlight">Analysierte Beweismaterialien vom 19.01.2026</span>
+                </div>
+
+                <div class="evidence-grid">
+                    <div class="evidence-card">
+                        <div class="evidence-title">[1] Polizeidokumentation mit rechtsextremer Codierung</div>
+                        <p style="color:#888; font-size:0.9rem; margin-bottom:10px;">Dateien: PAZ_2026-01-19-SH_33_88_AH-1/2.jpg</p>
+                        <ul class="code-list">
+                            <li><span class="error">2133:</span> Code für "Blood & Honour" (21 = 2.1 = B.A.; 33 = Christus-Symbol)</li>
+                            <li><span class="error">SH:</span> Doppeldeutiges Kürzel (Schleswig-Holstein / Sieg Heil)</li>
+                            <li><span class="error">88:</span> Standard-Neo-Nazi-Code ("Heil Hitler")</li>
+                            <li>Selektive Markierung auf einzelne Einsatzkräfte</li>
+                        </ul>
+                    </div>
+
+                    <div class="evidence-card">
+                        <div class="evidence-title">[2] Sportstatistik mit numerologischer Codierung</div>
+                        <p style="color:#888; font-size:0.9rem; margin-bottom:10px;">Datei: PAZ_2026-01-19-Komische_Fußballtabelle.jpg</p>
+                        <ul class="code-list">
+                            <li><span class="error">18:</span> Rechtsextremer Code für "Adolf Hitler" (1+8=9, 9. November)</li>
+                            <li><span class="error">33:</span> Esoterisch-numerologische Referenz auf "Christus"</li>
+                            <li><span class="error">666:</span> Biblische "Zahl des Tieres"</li>
+                            <li><span class="warning">Dateninkonsistenzen:</span> Mathematisch unmögliche Spieltagsdaten</li>
+                        </ul>
+                    </div>
+
+                    <div class="evidence-card">
+                        <div class="evidence-title">[3] Visuelle Manipulation in Sportberichterstattung</div>
+                        <p style="color:#888; font-size:0.9rem; margin-bottom:10px;">Datei: PAZ_2026-01-19-Spieler_Drei_Beine.jpg</p>
+                        <ul class="code-list">
+                            <li><span class="warning">Anatomische Unmöglichkeit:</span> Fußballspieler mit drei Beinen</li>
+                            <li><span class="error">Symbolische Überladung:</span> Visuelle Repräsentation statistischer Anomalien</li>
+                            <li><span class="highlight">KI-Generierung:</span> Hinweise auf künstliche Intelligenz bei Erstellung</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RND Analyse -->
+        <div class="terminal">
+            <div class="terminal-header">
+                <span class="terminal-btn btn-close"></span>
+                <span class="terminal-btn btn-min"></span>
+                <span class="terminal-btn btn-max"></span>
+                <span class="terminal-title">rrn@straße:~/rnd-analyse</span>
+            </div>
+            <div class="terminal-body">
+                <div><span class="prompt">rrn@straße$</span> <span class="command">./analyse_rnd.sh --deep-dive</span></div>
+                <div class="output">
+                    <span class="highlight">RedaktionsNetzwerk Deutschland (RND) - Medienkonzentration</span><br><br>
+                    
+                    <span class="error">Struktur und Kontrolle:</span><br>
+                    - 150+ Lokalzeitungen unter zentraler Kontrolle<br>
+                    - SPD-Beteiligung: 23,1% über Madsack Mediengruppe<br>
+                    - Reichweite: Über 7,2 Millionen Leser täglich<br>
+                    - Auflage: Mehr als 2,2 Millionen Exemplare<br><br>
+                    
+                    <span class="warning">Nazi-artige Beeinflussungsstrategien:</span><br>
+                    1. Graduelle Desensibilisierung: Wiederholte subliminale Codierung<br>
+                    2. Emotionale Konditionierung: Gezielte Emotionalisierung lokaler Nachrichten<br>
+                    3. Normalisierung extremistischer Semantik<br>
+                    4. Kontrolle der Informationshoheit: Totale Kontrolle in ländlichen Regionen
+                </div>
+
+                <div><span class="prompt">rrn@straße$</span> <span class="command">cat kontrollierte_zeitungen.txt</span></div>
+                <div class="output">
+                    <span class="highlight">Kontrollierte Regionalzeitungen (Auswahl)</span>
+                </div>
+                <div class="newspaper-list">
+                    <div class="newspaper-item">Hannoversche Allgemeine Zeitung</div>
+                    <div class="newspaper-item">Kieler Nachrichten</div>
+                    <div class="newspaper-item">Lübecker Nachrichten</div>
+                    <div class="newspaper-item">Ostsee-Zeitung</div>
+                    <div class="newspaper-item">Göttinger Tageblatt</div>
+                    <div class="newspaper-item">Cellesche Zeitung</div>
+                    <div class="newspaper-item">Wolfsburger Allgemeine</div>
+                    <div class="newspaper-item">Sächsische Zeitung</div>
+                    <div class="newspaper-item">Dresdner Neueste Nachrichten</div>
+                    <div class="newspaper-item">Leipziger Volkszeitung</div>
+                    <div class="newspaper-item">Mitteldeutsche Zeitung</div>
+                    <div class="newspaper-item">Magdeburger Volksstimme</div>
+                    <div class="newspaper-item">Thüringer Allgemeine</div>
+                    <div class="newspaper-item">Kölner Stadtanzeiger</div>
+                    <div class="newspaper-item">Kölnische Rundschau</div>
+                    <div class="newspaper-item">Ruhr Nachrichten</div>
+                    <div class="newspaper-item">Westfälische Rundschau</div>
+                    <div class="newspaper-item">Frankfurter Rundschau</div>
+                    <div class="newspaper-item">Wiesbadener Kurier</div>
+                    <div class="newspaper-item">Peiner Allgemeine Zeitung</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Institutionelle Inkompetenz -->
+        <div class="terminal">
+            <div class="terminal-header">
+                <span class="terminal-btn btn-close"></span>
+                <span class="terminal-btn btn-min"></span>
+                <span class="terminal-btn btn-max"></span>
+                <span class="terminal-title">rrn@straße:~/wahrheit</span>
+            </div>
+            <div class="terminal-body">
+                <div><span class="prompt">rrn@straße$</span> <span class="command">cat institutionelle_inkompetenz.txt</span></div>
+                <div class="output">
+                    <span class="highlight">Die harte Wahrheit über deutsche Institutionen</span><br><br>
+                    
+                    <span class="error">Kognitive Defizite der Sicherheitsorgane:</span><br>
+                    - <span class="warning">Polizei:</span> Operative Idiotie - sucht nach Täterprofilen, nicht nach subtiler Symbolik<br>
+                    - <span class="warning">Beamte:</span> Bürokratische Dummheit - folgen nur Vorschriften<br>
+                    - <span class="warning">Verfassungsschutz:</span> Konzeptionelle Blindheit - überfordert durch subliminale Beeinflussung<br>
+                    - <span class="warning">BND:</span> Geopolitische Fehleinschätzung - ignoriert interne Subversion<br><br>
+                    
+                    <span class="error">Medieninkompetenz der Bevölkerung:</span><br>
+                    - 99% der Menschheit ist dumm - statistische Realität<br>
+                    - Glauben alles was in Zeitung steht<br>
+                    - Tagesschau und RTL konsumieren statt kritisches Denken<br>
+                    - Bequemlichkeit und Ignoranz als kognitive Abwehrmechanismen
+                </div>
+
+                <div><span class="prompt">rrn@straße$</span> <span class="command">./korrelation_analyse.sh --region=peine</span></div>
+                <div class="output">
+                    <span class="highlight">RND-Zeitungsleserschaft: Direkte Korrelation mit Rechtsextremismus</span><br><br>
+                    
+                    <span class="error">Fallbeispiel Peine: Die PAZ-Effekte</span><br>
+                    - Peiner Allgemeine Zeitung (PAZ): Über 60% der Haushalte empfangen die PAZ<br>
+                    - Extremismus-Zunahme: Deutliche Zunahme von rechtsextremen Straftaten<br>
+                    - Jugendgewalt: Jugendliche zeigen verstärkt rechtsextreme Tendenzen<br>
+                    - Statistische Korrelation: Direkte Verbindung zwischen PAZ-Leserschaft und Extremismus-Raten<br><br>
+                    
+                    <span class="warning">Die unausweichliche Schlussfolgerung:</span><br>
+                    Wo RND gelesen wird, wächst Rechtsextremismus. Wo RND dominiert, zerfällt die Demokratie.
+                </div>
+            </div>
+        </div>
+
+        <!-- Die ultimative Wahrheit -->
+        <div class="terminal">
+            <div class="terminal-header">
+                <span class="terminal-btn btn-close"></span>
+                <span class="terminal-btn btn-min"></span>
+                <span class="terminal-btn btn-max"></span>
+                <span class="terminal-title">rrn@straße:~/ultimative_wahrheit</span>
+            </div>
+            <div class="terminal-body">
+                <div><span class="prompt">rrn@straße$</span> <span class="command">sudo cat die_ultimative_wahrheit.txt</span></div>
+                <div class="output">
+                    <span class="highlight">Die ultimative Wahrheit (für die 0,1% die es verstehen)</span><br><br>
+                    
+                    <span class="error">Die Ironie der Erkenntnis:</span><br>
+                    Du hast bis hierhin gelesen und denkst vielleicht, du gehörst zu den 0,1% Intellektuellen. <span class="warning">Falsch!</span><br><br>
+                    
+                    Die Wahrscheinlichkeit, dass du eine <span class="error">geistige Flachzange</span> bist, liegt bei 99,9%. Die Wahrscheinlichkeit, dass du das nicht akzeptieren willst, liegt bei 100%. Das ist der Beweis für deine kognitive Behinderung.<br><br>
+                    
+                    <span class="highlight">Willkommen im Club der geistigen Flachzangen!</span><br>
+                    Du bist in guter Gesellschaft:<br>
+                    - Mit Polizisten, Beamten, Verfassungsschützern<br>
+                    - Mit 99% der Menschheit<br>
+                    - Mit allen, die Tagesschau schauen und RTL konsumieren<br>
+                    - Mit allen, die glauben, in einer Demokratie zu leben<br><br>
+                    
+                    <span class="error">Die finale Botschaft:</span><br>
+                    Darum werden sie das hier auch alles nicht kapieren. Am besten, sie machen aus und gucken Tagesschau oder RTL!<br><br>
+                    
+                    Wenn du diesen Text liest und immer noch nicht verstehst, dass du Teil des Problems bist - dann hast du alles bewiesen.<br><br>
+                    
+                    <span class="highlight">Willkommen in der Matrix der geistigen Flachzangen!</span><br><br>
+                    
+                    <span style="color:#666;">(PS: Wenn du jetzt wütend bist und kommentieren willst, wie falsch das alles ist - beweist du nur weiter deine geistige Flachzange. Danke für die Bestätigung! ;-))</span>
+                </div>
+                
+                <div style="margin-top:20px; text-align:center;">
+                    <span class="prompt">rrn@straße$</span> <span class="command">echo "Wahrheit veröffentlicht. Ignoranz wird fortgesetzt..."</span>
+                    <div class="blink" style="display:inline;">_</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Rechtsradikales Recherche Netzwerk (RRN)</p>
+            <p style="margin-top:10px; font-size:0.8rem;">Wissenschaftliche Analyse & Dokumentation | Untersuchungsdatum: 19. Januar 2026</p>
+            <p style="margin-top:5px; color:#333;">|| <span class="blink">_</span> ||</p>
+        </div>
+    </div>
+
+    <script>
+        // Matrix Rain Effect
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = [];
+        
+        for (let i = 0; i < columns; i++) {
+            drops[i] = 1;
+        }
+        
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#ff3333';
+            ctx.font = fontSize + 'px monospace';
+            
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        
+        setInterval(drawMatrix, 35);
+        
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
